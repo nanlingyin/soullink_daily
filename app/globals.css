@@ -8,6 +8,10 @@
   color: #2b2533;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -15,10 +19,14 @@
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 12% 10%, rgba(255, 201, 234, 0.75), transparent 28%),
     radial-gradient(circle at 88% 8%, rgba(217, 198, 255, 0.75), transparent 30%),
     linear-gradient(135deg, #fff8f1 0%, #fff1f8 48%, #f5efff 100%);
+  background-attachment: fixed;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
@@ -33,11 +41,24 @@ select {
   font: inherit;
 }
 
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(255, 140, 198, 0.28);
+}
+
 .glass-card {
   border: 1px solid rgba(255, 255, 255, 0.72);
-  background: rgba(255, 255, 255, 0.68);
-  box-shadow: 0 18px 60px rgba(162, 112, 171, 0.18);
-  backdrop-filter: blur(18px);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.58));
+  box-shadow: 0 20px 70px rgba(111, 72, 137, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
 }
 
 .soft-button {
@@ -71,4 +92,34 @@ select {
 .field:focus {
   border-color: rgba(155, 123, 255, 0.8);
   box-shadow: 0 0 0 4px rgba(155, 123, 255, 0.14);
+}
+
+.soft-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 123, 255, 0.48) transparent;
+}
+
+.soft-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.soft-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgba(155, 123, 255, 0.42);
+}
+
+@media (max-width: 640px) {
+  body {
+    background-attachment: scroll;
+  }
+
+  .glass-card {
+    border-radius: 1.35rem;
+  }
+
+  .field {
+    border-radius: 0.9rem;
+    padding: 0.75rem 0.9rem;
+  }
 }

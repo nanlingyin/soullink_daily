@@ -7,13 +7,21 @@ type LocalMessage = {
   content: string;
 };
 
-export function ChatBox({ botId, botName }: { botId: string; botName: string }) {
+type ChatBoxLayout = "normal" | "dock" | "mobile-tab";
+
+export function ChatBox({ botId, botName, layout = "normal" }: { botId: string; botName: string; layout?: ChatBoxLayout }) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<LocalMessage[]>([
     { role: "assistant", content: `我在哦。今天想先看看我的日程，还是陪我聊一会儿？` }
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const panelSizeClass = {
+    normal: "min-h-[360px] lg:min-h-[420px]",
+    dock: "h-full min-h-0",
+    "mobile-tab": "h-[min(68vh,540px)] min-h-[420px]"
+  }[layout];
 
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,10 +49,10 @@ export function ChatBox({ botId, botName }: { botId: string; botName: string }) 
   }
 
   return (
-    <section className="glass-card rounded-[1.75rem] p-5">
+    <section className={`glass-card flex flex-col rounded-[1.75rem] p-4 sm:p-5 ${panelSizeClass}`}>
       <h3 className="text-xl font-black">和 {botName} 聊天</h3>
       <p className="mt-1 text-sm text-zinc-500">聊天会读取今日日程和最近动态</p>
-      <div className="mt-5 max-h-96 space-y-3 overflow-y-auto rounded-3xl bg-white/50 p-3">
+      <div className="soft-scrollbar mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-3xl bg-white/50 p-3">
         {messages.map((message, index) => (
           <div key={`${message.role}-${index}`} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
             <p className={`max-w-[82%] rounded-3xl px-4 py-3 text-sm leading-6 ${message.role === "user" ? "bg-purple-500 text-white" : "bg-white text-zinc-700"}`}>
@@ -53,7 +61,7 @@ export function ChatBox({ botId, botName }: { botId: string; botName: string }) 
           </div>
         ))}
       </div>
-      <form onSubmit={send} className="mt-4 flex gap-2">
+      <form onSubmit={send} className="mt-4 flex flex-col gap-2 sm:flex-row">
         <input className="field py-2" value={input} onChange={(event) => setInput(event.target.value)} placeholder="问问她今天做了什么..." />
         <button disabled={busy} className="soft-button shrink-0 px-5 py-2 text-sm font-bold">
           {busy ? "..." : "发送"}

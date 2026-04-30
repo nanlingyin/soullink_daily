@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { ImagePreview } from "@/components/ui/ImagePreview";
 
 type Post = {
   id: string;
@@ -69,12 +70,18 @@ function PostCard({ post }: { post: Post }) {
     <article className="glass-card overflow-hidden rounded-[1.75rem]">
       <div className="flex items-center gap-3 p-5">
         <img src={post.bot.avatarUrl || "/avatar-demo.svg"} alt={post.bot.name} className="h-12 w-12 rounded-2xl object-cover" />
-        <div>
+        <div className="min-w-0">
           <h3 className="font-black">{post.bot.name}</h3>
           <p className="text-xs text-zinc-500">{new Date(post.createdAt).toLocaleString("zh-CN")}</p>
         </div>
       </div>
-      <img src={post.imageUrl || "/placeholder-post.svg"} alt={post.caption} className="max-h-[640px] w-full object-cover" />
+      <ImagePreview
+        src={post.imageUrl || "/placeholder-post.svg"}
+        alt={post.caption}
+        downloadName={`${post.bot.name}-${post.id}.png`}
+        className="block w-full bg-gradient-to-br from-pink-50 to-violet-50"
+        imageClassName="max-h-[72vh] min-h-[260px] w-full object-cover transition duration-300 group-hover:scale-[1.01] sm:min-h-[360px]"
+      />
       <div className="space-y-4 p-5">
         <p className="leading-8 text-zinc-700">{post.caption}</p>
         <div className="flex flex-wrap gap-2 text-xs">
@@ -95,7 +102,7 @@ function PostCard({ post }: { post: Post }) {
             </div>
           ))}
         </div>
-        <form onSubmit={submitComment} className="flex gap-2">
+        <form onSubmit={submitComment} className="flex flex-col gap-2 sm:flex-row">
           <input className="field py-2" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="写一句评论，看看她怎么回复..." />
           <button disabled={busy} className="soft-button shrink-0 px-5 py-2 text-sm font-bold">
             发送
