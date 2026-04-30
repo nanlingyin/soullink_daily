@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" fill="none">
+  <rect width="960" height="720" rx="48" fill="#F9FAFB"/>
+  <rect x="56" y="56" width="848" height="608" rx="36" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="4"/>
+  <rect x="96" y="96" width="320" height="24" rx="12" fill="#E5E7EB"/>
+  <rect x="96" y="136" width="240" height="18" rx="9" fill="#F3F4F6"/>
+  <rect x="96" y="190" width="768" height="380" rx="28" fill="#F3E8FF"/>
+  <circle cx="728" cy="288" r="92" fill="#C4B5FD"/>
+  <circle cx="352" cy="360" r="118" fill="#FBCFE8"/>
+  <rect x="154" y="474" width="652" height="18" rx="9" fill="#DDD6FE"/>
+  <rect x="154" y="510" width="420" height="18" rx="9" fill="#E9D5FF"/>
+  <text x="480" y="372" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#6B21A8">soullink daily</text>
+</svg>

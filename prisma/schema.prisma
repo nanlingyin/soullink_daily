@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String           @id @default(cuid())
+  username     String
+  email        String           @unique
+  passwordHash String?
+  avatarUrl    String?
+  bots         AiBot[]
+  posts        BotPost[]
+  likes        BotPostLike[]
+  comments     BotPostComment[]
+  chatSessions ChatSession[]
+  memories     BotMemory[]
+  files        FileAsset[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model AiBot {
+  id                  String                @id @default(cuid())
+  userId              String
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String
+  avatarUrl           String?
+  standingImageUrl    String?
+  personaText         String
+  speakingStyle       String?
+  personalityTags     String?
+  worldSetting        String?
+  relationshipSetting String?
+  visualPrompt        String?
+  negativePrompt      String?
+  schedulePreference  String?
+  status              String                @default("enabled")
+  schedules           BotSchedule[]
+  posts               BotPost[]
+  chatSessions        ChatSession[]
+  memories            BotMemory[]
+  generationTasks     ImageGenerationTask[]
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+
+  @@index([userId])
+}
+
+model BotSchedule {
+  id              String                @id @default(cuid())
+  botId           String
+  bot             AiBot                 @relation(fields: [botId], references: [id], onDelete: Cascade)
+  scheduleDate    String
+  startTime       String
+  title           String
+  scene           String
+  mood            String
+  postStyle       String?
+  imagePromptHint String?
+  status          String                @default("pending")
+  source          String                @default("ai_generated")
+  sortOrder       Int                   @default(0)
+  executedAt      DateTime?
+  posts           BotPost[]
+  generationTasks ImageGenerationTask[]
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([botId, scheduleDate])
+  @@index([status, scheduleDate, startTime])
+}
+
+model BotPost {
+  id               String                @id @default(cuid())
+  botId            String
+  bot              AiBot                 @relation(fields: [botId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheduleId       String?
+  schedule         BotSchedule?          @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+  imageUrl         String?
+  caption          String
+  mood             String?
+  scene            String?
+  imagePrompt      String?
+  generationStatus String                @default("success")
+  likesCount       Int                   @default(0)
+  commentsCount    Int                   @default(0)
+  visibility       String                @default("private")
+  isPinned         Boolean               @default(false)
+  likes            BotPostLike[]
+  comments         BotPostComment[]
+  generationTasks  ImageGenerationTask[]
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@index([botId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model BotPostLike {
+  id        String   @id @default(cuid())
+  postId    String
+  post      BotPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([userId])
+}
+
+model BotPostComment {
+  id        String   @id @default(cuid())
+  postId    String
+  post      BotPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  aiReply   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId, createdAt])
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  botId     String
+  bot       AiBot         @relation(fields: [botId], references: [id], onDelete: Cascade)
+  title     String?
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([userId, botId, updatedAt])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  metadata  String?
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
+model BotMemory {
+  id         String   @id @default(cuid())
+  botId      String
+  bot        AiBot    @relation(fields: [botId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  memoryType String
+  content    String
+  weight     Int      @default(1)
+  source     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([botId, userId, memoryType])
+}
+
+model ImageGenerationTask {
+  id             String       @id @default(cuid())
+  botId          String
+  bot            AiBot        @relation(fields: [botId], references: [id], onDelete: Cascade)
+  scheduleId     String?
+  schedule       BotSchedule? @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+  postId         String?
+  post           BotPost?     @relation(fields: [postId], references: [id], onDelete: SetNull)
+  prompt         String?
+  inputImageUrl  String?
+  outputImageUrl String?
+  status         String       @default("pending")
+  errorMessage   String?
+  retryCount     Int          @default(0)
+  provider       String?
+  modelName      String?
+  cost           Float?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([status, createdAt])
+  @@index([botId, createdAt])
+}
+
+model FileAsset {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String
+  url       String
+  path      String
+  mimeType  String?
+  size      Int?
+  createdAt DateTime @default(now())
+
+  @@index([userId, kind, createdAt])
+}
